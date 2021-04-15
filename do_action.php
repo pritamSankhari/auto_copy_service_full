@@ -7,6 +7,7 @@
 	require './classes/script_list.php';
 	require './includes/status.php';
 	require './includes/script.php';
+	require './includes/auth.php';
 
 	require './vendor/autoload.php';
 	use Symfony\Component\Process\Process;
@@ -16,8 +17,11 @@
 	// -----------------------
 	// IF NOT POST REQUEST RECEIVED
 	// -----------------------	
-	if(!isset($_POST['action']) || empty($_POST)){
+	if((!isset($_POST['action']) || empty($_POST)) && is_logged_in()){
 
+		// -----------------------
+		// IF PASSING PARAMETER (action) NOT SET
+		// -----------------------	
 		if(!isset($_GET['action'])){
 
 			header('Location:'.BASE_URL);
@@ -31,7 +35,11 @@
 
 			$script_id = $db->real_escape_string($_GET['script_id']);
 			
-			if( run_script( $db , $script_id )) set_status('Script is running ... ', 1);
+			if( !is_valid_script_id( $db , $script_id )) set_status('Invalid Script ID !', 0);
+
+			else if( run_script( $db , $script_id )) set_status('Script is running ... ', 1);
+
+			else set_status('Failed to run the script !!! ', 0);
 			
 			header('Location:'.BASE_URL);	
 			exit();
@@ -91,7 +99,7 @@
 
 			if( $serverList->isServerInUse($_GET['server_id']) ){
 						
-				set_status('You can not remove this running server !!!', 0);
+				set_status('This server is in use !!!', 0);
 			}
 
 			else{
@@ -112,6 +120,17 @@
 			header('Location:'.BASE_URL.'index.php?action=show_servers');	
 			exit();
 		}
+
+		// -----------------------
+		// DO USER LOGOUT
+		// -----------------------
+		else if($_GET['action']=='do_logout'){
+
+			do_logout();
+
+			header('Location:'.BASE_URL);	
+			exit();
+		}
 	}
 
 	// -----------------------
@@ -125,7 +144,7 @@
 		    empty($_POST['server_name']) || 
 		    empty($_POST['server_path'])){
 			
-			set_status('Server name or server path can not be empty !', 0);
+			set_status('Server name and server path can not be empty !', 0);
 			header('Location:'.BASE_URL);
 			exit();
 		}
@@ -172,6 +191,17 @@
 		$src_id = $db->real_escape_string($_POST['source_id']);
 		$dest_id = $db->real_escape_string($_POST['destination_id']);
 
+		if($src_id == "null"){
+			set_status('Source path is not set !', 0);
+			header('Location:'.BASE_URL);
+			exit();				
+		}
+		if($dest_id == "null"){
+			set_status('Destination path is not set !', 0);
+			header('Location:'.BASE_URL);
+			exit();				
+		}
+
 		$scriptList = new ScriptList($db);
 
 		
@@ -187,6 +217,36 @@
 		set_status('Script added successfully !', 1);
 		header('Location:'.BASE_URL);
 		exit();	
+	}
+	// -----------------------
+	// DO USER LOG IN
+	// -----------------------
+	else if($_POST['action'] == 'do_login'){
+
+		if(
+			!isset($_POST['user_id']) ||
+			!isset($_POST['user_pwd']) ||
+			empty($_POST['user_id']) ||
+			empty($_POST['user_pwd'])
+		){
+
+			set_status('User ID and Password can not be empty !', 0);
+			header('Location:'.BASE_URL);
+			exit();	
+		}
+
+		$user_id = $db->real_escape_string($_POST['user_id']);
+		$user_pwd = $db->real_escape_string($_POST['user_pwd']);
+
+		if(!do_login($user_id,$user_pwd)){
+
+			set_status('Incorrect User ID or Password  !', 0);
+			header('Location:'.BASE_URL);
+			exit();	
+		}
+
+		header('Location:'.BASE_URL);	
+		exit();
 	}
 
 	else{

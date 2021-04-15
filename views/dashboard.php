@@ -1,6 +1,6 @@
 <div class="nav-bar">
 	<a class="btn btn-add" href="<?= BASE_URL.'index.php?action=show_servers' ?>">Show all servers</a>
-	<a class="btn btn-light-red" href="<?= BASE_URL ?>">Log out</a>
+	<a class="btn btn-light-red" href="<?= BASE_URL.'do_action.php?action=do_logout' ?>">Log out</a>
 </div>
 
 
@@ -129,7 +129,7 @@
 						<?= $script['destination_path']?>		
 					</td>
 					<td>
-						<?php if($script['process_id'] == 0):?>
+						<?php if($script['process_id'] < 1):?>
 							<a href="<?= BASE_URL.'do_action.php?action=run_script&script_id='.$script['script_id'] ?>"><button class="btn-start">Start</button></a>
 						<?php else:?>
 							<a href="<?= BASE_URL.'do_action.php?action=stop_script&script_id='.$script['script_id'] ?>"><button class="btn-stop">Stop</button></a>

@@ -1,6 +1,26 @@
 .content{
 	font-family:tahoma;
 }
+.system-heading-block{
+	font-family:garamond;
+	font-size: 30px;
+	font-variant: small-caps;
+
+	margin:10px;
+	padding: 20px;
+	
+	text-align: center;
+	
+	display: flex;
+	justify-content: center;
+
+	/*background-color: darkslateblue;*/
+	/*color: white;*/
+	
+}
+.system-heading-block h1{
+	width: 600px;
+}
 a{
 	text-decoration: none;
 }
@@ -76,7 +96,15 @@ button,.btn{
 	padding-top: 8px;
 	padding-right: 15px;
 	padding-bottom: 8px;
+	user-select: none;
 	
+}
+.btn-success{
+	color:white;
+	background-color: mediumseagreen;
+}
+.btn-success:hover{
+	background-color: seagreen;	
 }
 .btn-start{
 	background-color: dodgerblue;
@@ -123,6 +151,14 @@ button,.btn{
 	height: 0px;
 	transform: scaleY(0);
 }
+.login-form-table{
+	display: flex;
+	justify-content: center;
+}
+.login-form-table table{
+	background-color: lightgrey;
+	border-radius: 5px;
+}
 .status-msg-block{
 	/*transition: 1s;*/
 }
@@ -168,13 +204,18 @@ button,.btn{
 	margin:10px;
 	margin-top: 30px;
 
-	background-color: lightgrey;
+	/*display: flex;*/
+	/*justify-content: center;*/
+	/*background-color: lightgrey;*/
 	padding: 10px;
-	box-shadow: 4px 2px 5px 2px lightgrey;
+	
 }
 .script-list-block table{
 	
+	/*width: 800px;*/
 	width: 100%;
+	/*background-color: lightgrey;*/
+	box-shadow: 4px 4px 8px 5px lightgrey;
 	text-align: center;
 }
 .script-list-block table td{
@@ -200,3 +241,26 @@ button,.btn{
   }
 }
 
+@media only screen and (max-width:800px) {
+
+  /**{
+  	margin:0px;
+  	padding: 0px;
+  }*/
+  .btn {
+    padding: 10px;
+    text-decoration: underline;
+    line-height: 30px;
+    background-color: white;
+    color:dodgerblue;
+    font-weight: 800;
+  }
+  .btn:hover{
+  	color:darkblue;
+  	background-color: white;
+  }
+
+  /*.script-list-block table{
+  	width: 60%;
+  }*/
+}

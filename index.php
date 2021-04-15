@@ -6,17 +6,22 @@
 	require './classes/server_list.php';
 	require './classes/script_list.php';
 	require './includes/status.php';
+	require './includes/auth.php';
 	
 	$header = 'views/header.php';
 	$view = '';
 	$footer = 'views/footer.php';
 
+
 	$serverList = new ServerList($db);
 	$servers = $serverList->getAll();
 
-	if(!isset($_GET) || empty($_GET)){
-
+	if(!is_logged_in()){
 		
+		$view = 'views/login.php';		
+	}
+
+	else if(!isset($_GET) || empty($_GET)){
 
 		$scriptList = new ScriptList($db);
 		$scripts = $scriptList->getAllInDetail();

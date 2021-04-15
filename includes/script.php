@@ -3,7 +3,7 @@
 
 	function run_script($db,$id){
 		
-		$script = new Process(['start','acs_main',$id]);
+		$script = new Process(['start','tools\acs',$id]);
 		$script->start();
 
 		$scriptList = new ScriptList($db);
@@ -15,6 +15,8 @@
 
 			if(!$scripts = $scriptList->getScriptById($id)) return false;
 			$process_id = (int) $scripts[0]['process_id'];	
+
+			if( $process_id < 0 ) return false;
 		}
 		
 		return true;
@@ -55,6 +57,15 @@
 		if($process_id < 1) return false;
 
 		return true;
+	}
+
+	function is_valid_script_id($db,$id){
+		
+		$scriptList = new ScriptList($db);		
+
+		if( $scriptList->isValidScriptId( $id ) ) return true;
+
+		return false;
 	}
 
 ?>

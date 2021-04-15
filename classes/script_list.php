@@ -171,5 +171,21 @@
 
 			return true;	
 		}
+
+		function isValidScriptId($id){
+
+			$this->id = $id;	
+			
+			$sql = "
+
+				SELECT * FROM scripts WHERE id = $id
+			";
+
+			if(!$result = $this->database->query($sql)) return false;
+
+			if($result->num_rows > 0) return true;
+
+			return false;
+		}
 	}
 ?>
