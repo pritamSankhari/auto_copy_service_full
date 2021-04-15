@@ -1,0 +1,202 @@
+.content{
+	font-family:tahoma;
+}
+a{
+	text-decoration: none;
+}
+.nav-bar{
+	padding-top: 20px;
+	padding-bottom: 20px;
+	margin:10px;
+	background-color: white;
+
+}
+section{
+	margin:10px;
+}
+form{
+	margin:10px;
+	/*margin-bottom: 20px;*/
+	font-family: consolas;
+	font-size:18px;
+	background-color: lightgrey;
+
+
+}
+form h3{
+	background-color: black;
+	color: white;
+	font-variant-caps:small-caps;
+	font-size: 24px;
+	padding: 10px;
+	font-family: sans-serif;
+	user-select: none;
+	cursor: pointer;
+	margin: 0;
+}
+form table{
+	padding: 10px;
+	transition: 2s;
+}
+input,label,select{
+	user-select: none;
+	margin:10px;
+	font-family: consolas;
+	font-size:18px;
+	border:none;
+	padding: 5px;
+	border-radius: 5px;
+}
+input[type=text],select{
+	/*border: 2px solid grey;*/
+}
+input[type=submit]{
+	
+	border: none;
+
+	font-variant-caps:small-caps;
+	width: 100px;
+	padding: 5px;
+}
+input[type=submit]:hover{
+	background-color: darkslateblue;
+	cursor: pointer;
+}
+button,.btn{
+	
+	cursor: pointer;
+	/*width: 60px;*/
+	
+	border: none;
+	border-radius: 4px;
+	transition: .5s;
+	text-align: center;
+
+	padding-left: 15px;
+	padding-top: 8px;
+	padding-right: 15px;
+	padding-bottom: 8px;
+	
+}
+.btn-start{
+	background-color: dodgerblue;
+	color: white;
+}
+.btn-start:hover{
+	background-color: steelblue;
+}
+.btn-stop{
+	background-color: tomato;
+	color: white;	
+}
+.btn-stop:hover{
+	background-color: sienna;
+}
+.btn-add{
+	background-color: slateblue;
+	color: white;	
+}
+.btn-add:hover{
+	background-color: darkslateblue;
+}
+.btn-light-red{
+	background-color: whitesmoke;	
+	color:firebrick;
+}
+.btn-light-red:hover{
+	background-color: gainsboro;
+	color: darkred;
+}
+.add-server-label{
+	box-shadow: 2px 2px 8px 0px black;
+}
+.add-script-label{
+	box-shadow: 2px 2px 8px 0px black;
+}
+.add-server-form-input-table{
+	transition: .5s;
+	height: 0px;
+	transform: scaleY(0);
+}
+.add-script-form-input-table{
+	transition: .5s;
+	height: 0px;
+	transform: scaleY(0);
+}
+.status-msg-block{
+	/*transition: 1s;*/
+}
+.status-msg{
+	margin:10px;
+	padding: 15px;
+	font-family: consolas;
+	font-variant-caps: small-caps;
+
+	display: flex;
+	justify-content: center;
+
+}
+.status-msg-text{
+	width: 100%;
+	text-align: left;
+	
+}
+.status-msg-close-icon{
+	width: 100%;
+	text-align: right;
+}
+.status-msg-close-icon i{
+	cursor: pointer;
+}
+.status-msg-success{
+	color:white;
+	background-color: seagreen;
+}
+.status-msg-error{
+	color:white;
+	background-color: sienna;
+}
+.show-all-servers-label{
+	font-family:tahoma;
+	margin:10px;
+	margin-top: 30px;
+}
+
+.script-list-block{
+	font-family:tahoma;
+	font-variant-caps: small-caps;
+	margin:10px;
+	margin-top: 30px;
+
+	background-color: lightgrey;
+	padding: 10px;
+	box-shadow: 4px 2px 5px 2px lightgrey;
+}
+.script-list-block table{
+	
+	width: 100%;
+	text-align: center;
+}
+.script-list-block table td{
+	padding: 20px;
+}
+
+.error-404{
+	background-color: oldlace;
+	margin: 10px;
+	padding: 20px;
+	color: indianred;
+}
+
+/* The animation code */
+@keyframes fadeOutStatus {
+  from {
+  	display: block;
+  	scaleY(1);
+  }
+  to {
+  	scaleY(0);
+  	display: none;
+  }
+}
+

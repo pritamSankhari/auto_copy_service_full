@@ -1,7 +1,7 @@
 <?php
 	$username = 'root';
 	$hostserver = 'localhost';
-	$database = 'create_copy';
+	$database = 'acs';
 	$password = 'MyPasswordNew';
 
 	$db = new mysqli($hostserver,$username,$password,$database);

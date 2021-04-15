@@ -3,7 +3,7 @@
 
 	function run_script($db,$id){
 		
-		$script = new Process(['start','create_copy_script',$id]);
+		$script = new Process(['start','acs_main',$id]);
 		$script->start();
 
 		$scriptList = new ScriptList($db);

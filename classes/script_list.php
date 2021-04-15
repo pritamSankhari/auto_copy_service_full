@@ -139,6 +139,25 @@
 			return false;
 		}
 
+		function deleteScriptWithServer($server_id){
+
+			$this->id = $server_id;
+
+			$sql = "
+
+				DELETE 
+				
+				FROM 
+					scripts
+				WHERE 
+					source_id = $this->id OR destination_id = $this->id
+			";
+
+			if(!$result = $this->database->query($sql)) return false;
+
+			return true;	
+		}
+
 		function deleteById($id){
 
 			$this->id = $id;

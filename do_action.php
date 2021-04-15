@@ -28,8 +28,10 @@
 		// RUN SCRIPT
 		// -----------------------		
 		if($_GET['action']=='run_script' && isset($_GET['script_id'])){
+
+			$script_id = $db->real_escape_string($_GET['script_id']);
 			
-			if( run_script( $db , $_GET['script_id'] ) ) set_status('Script has been started !', 1);
+			if( run_script( $db , $script_id )) set_status('Script is running ... ', 1);
 			
 			header('Location:'.BASE_URL);	
 			exit();
@@ -40,7 +42,9 @@
 		// -----------------------		
 		else if($_GET['action']=='stop_script' && isset($_GET['script_id'])){
 
-			if(stop_script( $db , $_GET['script_id'] ) ){
+			$script_id = $db->real_escape_string($_GET['script_id']);
+
+			if(stop_script( $db , $script_id ) ){
 				
 				set_status('Script has been terminated !', 1);
 			}
@@ -54,14 +58,16 @@
 		// -----------------------		
 		else if($_GET['action']=='delete_script' && isset($_GET['script_id'])){
 
-			if( is_script_running( $db , $_GET['script_id'] ) ){
+			$script_id = $db->real_escape_string($_GET['script_id']);
+
+			if( is_script_running( $db , $script_id ) ){
 						
 				set_status('You can not delete script which is currenly running !', 0);
 			}
 
 			else{
 
-				if( delete_script( $db, $_GET['script_id'] ) ){
+				if( delete_script( $db, $script_id ) ){
 					set_status('Script has been deleted successfully !', 1);		
 				}
 				else{
@@ -70,6 +76,40 @@
 			}
 
 			header('Location:'.BASE_URL);	
+			exit();
+		}
+
+		// -----------------------
+		// REMOVE SERVER
+		// -----------------------		
+		else if($_GET['action']=='remove_server' && isset($_GET['server_id'])){
+
+			$server_id = $db->real_escape_string($_GET['server_id']);
+
+			$serverList = new ServerList($db);
+			$scriptList = new ScriptList($db);
+
+			if( $serverList->isServerInUse($_GET['server_id']) ){
+						
+				set_status('You can not remove this running server !!!', 0);
+			}
+
+			else{
+
+				if( !$scriptList->deleteScriptWithServer( $server_id ) ){
+
+					set_status('Failed to remove server !', 0);
+				}
+				
+				else if( $serverList->deleteById( $server_id ) ){
+					set_status('Server has been removed successfully !', 1);		
+				}
+				else{
+					set_status('Failed to remove server !', 0);
+				}
+			}
+
+			header('Location:'.BASE_URL.'index.php?action=show_servers');	
 			exit();
 		}
 	}
