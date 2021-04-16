@@ -1,5 +1,8 @@
 .content{
 	font-family:tahoma;
+	display: block;
+	justify-content: center;
+	width: 100%;
 }
 .system-heading-block{
 	font-family:garamond;
@@ -40,8 +43,7 @@ form{
 	font-family: consolas;
 	font-size:18px;
 	background-color: lightgrey;
-
-
+	width: 99%;
 }
 form h3{
 	background-color: black;
@@ -53,10 +55,12 @@ form h3{
 	user-select: none;
 	cursor: pointer;
 	margin: 0;
+
 }
 form table{
 	padding: 10px;
 	transition: 2s;
+	width: 40%;
 }
 input,label,select{
 	user-select: none;
@@ -260,6 +264,18 @@ button,.btn{
   	background-color: white;
   }
 
+  form table{
+  	width: 100%;
+  }
+  form table tr td{
+  	width: 40%;
+  }
+  form table tr label{
+  	width: 60%;
+  }
+  form table tr input{
+  	width: 92%; 
+  }
   /*.script-list-block table{
   	width: 60%;
   }*/
