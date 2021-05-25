@@ -5,6 +5,10 @@
 	require './config/db.php';
 	require './classes/server_list.php';
 	require './classes/script_list.php';
+	require './classes/general.php';
+	require './classes/script_log.php';
+	require './classes/backup_model.php';
+
 	require './includes/status.php';
 	require './includes/script.php';
 	require './includes/auth.php';
@@ -37,7 +41,13 @@
 			
 			if( !is_valid_script_id( $db , $script_id )) set_status('Invalid Script ID !', 0);
 
-			else if( run_script( $db , $script_id )) set_status('Script is running ... ', 1);
+			else if( run_script( $db , $script_id )){
+
+				set_status('Script is running ... ', 1);
+
+				run_backup($db,$script_id);
+
+			} 
 
 			else set_status('Failed to run the script !!! ', 0);
 			
@@ -55,6 +65,8 @@
 			if(stop_script( $db , $script_id ) ){
 				
 				set_status('Script has been terminated !', 1);
+
+				stop_backup($db,$script_id);
 			}
 
 			header('Location:'.BASE_URL);	
@@ -76,6 +88,10 @@
 			else{
 
 				if( delete_script( $db, $script_id ) ){
+
+					$general = new General($db);
+					$general->dropTable("script_log_$script_id");
+					
 					set_status('Script has been deleted successfully !', 1);		
 				}
 				else{
@@ -122,6 +138,40 @@
 		}
 
 		// -----------------------
+		// REMOVE LOG
+		// -----------------------
+		else if($_GET['action'] == 'remove_log'){
+
+			if(
+				!isset($_GET['script_id']) || empty($_GET['script_id'])
+			){
+
+				set_status('Script ID not set !', 0);
+				header('Location:'.BASE_URL);
+				exit();	
+			}
+
+			$script_id = $db->real_escape_string($_GET['script_id']);
+			$log_id = $_GET['log_id'];
+
+			$script_log = new ScriptLog($db,$script_id);
+
+			// echo $log_id;
+			// exit();
+			if(!$script_log->deleteById($log_id)){
+
+				set_status('Failed to delete log !', 0);
+				header('Location:'.BASE_URL);
+				exit();			
+			}
+
+			set_status('Log(s) have been deleted successfully !', 1);
+			header('Location:'.BASE_URL);
+			exit();
+
+		}
+
+		// -----------------------
 		// DO USER LOGOUT
 		// -----------------------
 		else if($_GET['action']=='do_logout'){
@@ -144,7 +194,7 @@
 		    empty($_POST['server_name']) || 
 		    empty($_POST['server_path'])){
 			
-			set_status('Server name and server path can not be empty !', 0);
+			set_status('Server/directory name and server/directory path can not be empty !', 0);
 			header('Location:'.BASE_URL);
 			exit();
 		}
@@ -158,13 +208,119 @@
 		
 		if(!$serverList->addServer($server_name,$server_path)){
 
-			set_status('Failed to add server !', 0);
+			set_status('Failed to add server/directory !', 0);
 			header('Location:'.BASE_URL);
 			exit();	
 		}
 		
 
-		set_status('Server added successfully !', 1);
+		set_status('Server/directory added successfully !', 1);
+		header('Location:'.BASE_URL);
+		exit();	
+	}
+
+	// -----------------------
+	// UPDATE SERVER
+	// -----------------------
+	else if($_POST['action'] == 'update_server'){
+
+		if(
+			!isset($_POST['server_name']) ||
+		    !isset($_POST['server_path']) || 
+		    empty($_POST['server_name']) || 
+		    empty($_POST['server_path'])){
+			
+			set_status('Server name and server path can not be empty !', 0);
+			header(BASE_URL.'index.php?action=show_servers');
+			exit();
+		}
+
+		$server_name = $db->real_escape_string($_POST['server_name']);
+		$server_path = $db->real_escape_string($_POST['server_path']);
+
+		$serverList = new ServerList($db);
+
+		
+		
+		if(!$serverList->updateServerById($_POST['server_id'],$server_name,$server_path)){
+
+			set_status('Failed to update server/directory !', 0);
+			header('Location:'.BASE_URL);
+			exit();	
+		}
+		
+
+		set_status('Server/directory updated successfully !', 1);
+		header('Location:'.BASE_URL);
+		exit();	
+	}
+
+	// -----------------------
+	// SET BACKUP PATH
+	// -----------------------
+	else if($_POST['action'] == 'set_backup_path'){
+
+		if(
+			!isset($_POST['backup_path']) ||
+		    !isset($_POST['backup_dir']) || 
+		    !isset($_POST['script_id']) || 
+		    empty($_POST['backup_path']) || 
+		    empty($_POST['backup_dir']) ||
+		    empty($_POST['script_id'])
+		){
+			
+			set_status('Path not set !', 0);
+			header(BASE_URL.'index.php?action=backup_dir');
+			exit();
+		}
+
+		$script_id = $_POST['script_id'];
+		$backup_dir_path = $db->real_escape_string($_POST['backup_path']);
+		$backup_dir_name = $db->real_escape_string($_POST['backup_dir']);
+
+		$backup = new BackupDirs($db);
+
+		if(!$backup->add($backup_dir_name,$backup_dir_path,$script_id)){
+
+			set_status('Backup Path is not set !', 0);
+			header('Location:'.BASE_URL);
+			exit();		
+		}
+		
+
+		set_status('Backup Path Added !', 1);
+		header('Location:'.BASE_URL);
+		exit();	
+	}
+
+	// -----------------------
+	// UPDATE BACKUP INFO
+	// -----------------------
+	else if($_POST['action'] == 'update_backup_info'){
+
+		if(
+			!isset($_POST['backup_name']) ||
+		    !isset($_POST['backup_path']) || 
+		    empty($_POST['backup_name']) || 
+		    empty($_POST['backup_path'])){
+			
+			set_status('Backup name and backup path is not set !', 0);
+			header(BASE_URL.'index.php?action=backup_dir');
+			exit();
+		}
+
+		$backup_name = $db->real_escape_string($_POST['backup_name']);
+		$backup_path = $db->real_escape_string($_POST['backup_path']);
+
+		$backup = new BackupDirs($db);
+
+		if(!$backup->updateBackupInfo($backup_name,$backup_path,$_POST['script_id'])){
+
+			set_status('Failed to update backup info !', 0);
+			header('Location:'.BASE_URL);
+			exit();	
+		}
+
 		header('Location:'.BASE_URL);
 		exit();	
 	}
@@ -202,6 +358,7 @@
 			exit();				
 		}
 
+		$general = new General($db);
 		$scriptList = new ScriptList($db);
 
 		
@@ -213,11 +370,156 @@
 			exit();	
 		}
 		
+		$lastId = $scriptList->getLastAddedScriptId();
 
-		set_status('Script added successfully !', 1);
+		// ADD A SCRIPT LOG TABLE
+		if(!$general->tableExist("script_log_$lastId")){
+
+			if($scriptList->addScriptLogTable($lastId)){
+
+				set_status('Script added successfully !', 1);
+				header('Location:'.BASE_URL);
+				exit();			
+			}
+
+			set_status('Script added successfully. But failed to created script log table !', 0);
+			header('Location:'.BASE_URL);
+			exit();			
+		}
+
+		set_status('Script added successfully ! Script log table is already exists !', 1);
 		header('Location:'.BASE_URL);
-		exit();	
+		exit();			
+		
 	}
+	// -----------------------
+	// TOGGLE DAILY BACKUP
+	// -----------------------
+	else if($_POST['action'] == 'toggle_daily_backup'){
+
+		if(
+			!isset($_POST['script_id']) || 
+			empty($_POST['script_id'])
+		){
+			
+			set_status('Failed to toggle backup mode !', 0);
+			header('Location:'.BASE_URL);
+			exit();
+		}
+		$backup = new BackupDirs($db);
+		$daily_backup = $backup->getBackupModeStatus();
+
+		if($daily_backup[$_POST['script_id']] == 1){
+			$backup->toggleBackupMode($_POST['script_id'],0);
+		}
+		else $backup->toggleBackupMode($_POST['script_id'],1);
+		
+		header('Location:'.BASE_URL);
+		exit();
+	}
+	
+	// -----------------------
+	// DO IMPORT LOG
+	// -----------------------
+	else if($_POST['action'] == 'import_log'){
+
+		if(
+			!isset($_POST['script_id']) || empty($_POST['script_id'])
+		){
+
+			set_status('Script ID not set !', 0);
+			header('Location:'.BASE_URL);
+			exit();	
+		}
+
+		$script_id = $db->real_escape_string($_POST['script_id']);
+
+		if(empty($_FILES['textfile']['name'])){
+	    	set_status("No input file has been selected !",0);
+	    	header('Location:'.BASE_URL.'index.php?action=import_from_txt');
+	    	exit();
+	    }
+		
+		// echo "<pre>";
+
+		// print_r($_FILES);
+
+		// Whether file is uploaded or not
+	    if(!is_uploaded_file($_FILES['textfile']['tmp_name'])){
+	    	
+	    	set_status("File not uploaded !",0);
+	    	header('Location:'.BASE_URL.'index.php?action=import_from_txt');
+	    	exit();
+	    }
+
+	    $filename = $_FILES['textfile']['name'];
+	    $fileType = strtolower(pathinfo($filename,PATHINFO_EXTENSION));
+
+	    if($fileType != "txt"){
+
+	    	set_status("Incorrect File Format !",0);
+	    	header('Location:'.BASE_URL.'index.php?action=import_from_txt');
+	    	exit();
+	    }
+
+	    $f = fopen($_FILES['textfile']['tmp_name'], 'r');
+	    
+	    
+	    $script_log = new ScriptLog($db,$script_id);
+	    
+	    while($data = fgets($f)){
+	    	
+	    	if(!$script_log->add(trim($data))){
+
+	    		set_status("Failed to add log !",0);
+	    		header('Location:'.BASE_URL.'index.php?action=import_from_txt');
+	    		exit();		
+	    	}
+
+	    }
+	   
+	    set_status("Logs imported successfully");
+		header('Location:'.BASE_URL);	
+		exit();
+	}
+
+	// -----------------------
+	// REMOVE SELECTED LOG(S)
+	// -----------------------
+	else if($_POST['action'] == 'remove_selected_logs'){
+
+		if(
+			!isset($_POST['script_id']) || empty($_POST['script_id'])
+		){
+
+			set_status('Script ID not set !', 0);
+			header('Location:'.BASE_URL);
+			exit();	
+		}
+
+		$script_id = $db->real_escape_string($_POST['script_id']);
+		$log_id = $_POST['log_id'];
+
+		$script_log = new ScriptLog($db,$script_id);
+
+		for($i=0;$i<count($log_id);$i++){
+
+			if(!$script_log->deleteById($log_id[$i])){
+
+				set_status('Failed to delete log !', 0);
+				header('Location:'.BASE_URL);
+				exit();			
+			}
+		}
+
+		set_status('Log(s) have been deleted successfully !', 1);
+		header('Location:'.BASE_URL);
+		exit();
+
+	}
+
+
+
 	// -----------------------
 	// DO USER LOG IN
 	// -----------------------

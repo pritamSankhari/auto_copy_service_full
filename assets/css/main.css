@@ -74,6 +74,16 @@ input,label,select{
 input[type=text],select{
 	/*border: 2px solid grey;*/
 }
+input[type=checkbox]{
+	width: 30px;
+	height: 30px;
+	
+}
+input[type="checkbox"]:checked{
+	
+
+}
+
 input[type=submit]{
 	
 	border: none;
@@ -83,7 +93,7 @@ input[type=submit]{
 	padding: 5px;
 }
 input[type=submit]:hover{
-	background-color: darkslateblue;
+	/*background-color: darkslateblue;*/
 	cursor: pointer;
 }
 button,.btn{
@@ -164,7 +174,10 @@ button,.btn{
 	border-radius: 5px;
 }
 .status-msg-block{
-	/*transition: 1s;*/
+	transition: 1s;
+	margin:0;
+	/*height: 20px;*/
+	/*border: 1px solid black;*/
 }
 .status-msg{
 	margin:10px;
@@ -224,6 +237,10 @@ button,.btn{
 }
 .script-list-block table td{
 	padding: 20px;
+}
+
+#show_servers_table td{
+	border-bottom: 1px solid lightgrey;
 }
 
 .error-404{

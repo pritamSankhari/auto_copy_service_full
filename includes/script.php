@@ -3,7 +3,7 @@
 
 	function run_script($db,$id){
 		
-		$script = new Process(['start','tools\acs',$id]);
+		$script = new Process(['start','tools\acsv2',$id]);
 		$script->start();
 
 		$scriptList = new ScriptList($db);
@@ -22,6 +22,36 @@
 		return true;
 	}
 
+	function run_backup($db,$script_id){
+		
+		$backup = new BackupDirs($db);
+
+		// if backup for this script not exists
+		if(!$backup_process = $backup->getProcessByScript($script_id)) return false;
+
+		$daily_backup = $backup->getBackupModeStatus();
+
+		if($daily_backup[$script_id] == 0) return false;
+
+		$script = new Process(['start','tools\ab',$script_id]);
+		$script->start();
+
+		
+		if(!$backup_process = $backup->getProcessByScript($script_id)) return false;
+		$process_id = (int) $backup_process['backup_process_id'];
+
+		while($process_id < 1){
+
+			if(!$backup_process = $backup->getProcessByScript($script_id)) return false;
+			
+			$process_id = (int) $backup_process['backup_process_id'];
+
+			if( $process_id < 0 ) return false;
+		}
+		
+		return true;
+	}
+
 	function stop_script($db,$id){
 
 		$scriptList = new ScriptList($db);
@@ -33,6 +63,22 @@
 		exec("taskkill /F /PID $process_id");
 		
 		if($scriptList->updateProcessId($id)) return true;
+
+		return false;
+	}
+
+	function stop_backup($db,$id){
+
+		$backup = new BackupDirs($db);
+
+		if(!$backup_process = $backup->getProcessByScript($id)) return false;
+
+		$process_id = $backup_process['backup_process_id'];
+
+
+		exec("taskkill /F /PID $process_id");
+		
+		if($backup->updateProcessId($id)) return true;
 
 		return false;
 	}

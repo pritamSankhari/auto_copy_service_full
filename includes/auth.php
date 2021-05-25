@@ -13,7 +13,7 @@
 
 		if($user_id == 'admin'){
 
-			if($pwd == 'admin@125'){
+			if($pwd == 'admin@123'){
 
 				$_SESSION['user']['id'] = $user_id;
 

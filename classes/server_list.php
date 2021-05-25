@@ -60,6 +60,27 @@
 			return false;
 		}
 
+		function getServerById($id){
+
+			$this->id = $id;
+			
+			$sql = "
+
+				SELECT * FROM servers WHERE id = $this->id
+			";
+
+			if(!$result = $this->database->query($sql)) return false;
+
+			$servers = array();
+			
+			if($result->num_rows > 0){
+
+				return $result->fetch_assoc();
+			}
+
+			return false;
+		}
+
 		function isServerInUse($id){
 
 			$this->id = $id;
@@ -116,7 +137,27 @@
 
 			return false;
 		}
+		function updateServerById($id,$name,$path){
 
+			$this->id = $id;
+			$this->name = $name;
+			$this->path = $path;
+
+			$sql = "
+
+				UPDATE 
+					servers 
+				SET 
+					name = '$this->name',
+					path = '$this->path'
+				WHERE 
+					id = $this->id
+			";
+
+			if(!$result = $this->database->query($sql)) return false;
+
+			return true;	
+		}
 		function deleteById($id){
 
 			$this->id = $id;

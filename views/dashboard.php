@@ -1,5 +1,7 @@
 <div class="nav-bar">
 	<a class="btn btn-add" href="<?= BASE_URL.'index.php?action=show_servers' ?>">Show all servers</a>
+	<a class="btn btn-start" href="<?= BASE_URL.'index.php?action=backup_dir' ?>">Backup Path(s)</a>
+	<a class="btn btn-success" href="<?= BASE_URL.'index.php?action=import_from_txt' ?>">Import Script Logs</a>
 	<a class="btn btn-light-red" href="<?= BASE_URL.'do_action.php?action=do_logout' ?>">Log out</a>
 </div>
 
@@ -100,22 +102,41 @@
 		</table>
 	</div>	
 </form>
+<section>
+	<form action="<?= BASE_URL ?>" method="get">
+		<label>Show Script Logs:</label>
+		<select name="script_id">
+			<?php foreach ($scripts as $script):?>
+			<option value="<?= $script['script_id']?>"><?= $script['script_name'] ?></option>
+			<?php endforeach;?>
 
+		</select>
+		<input type="hidden" value="show_script_log" name="action">
+		<input class="btn btn-success" type="submit" name="show" value="Show">
+	</form>
+	
+</section>
 <section class="script-list-block">
 	
 	<?php if($scripts == true):?>
+		<h2 style="text-align: center;">Script(s) for Copy</h2>
 		<div>
 			<table>
 				<tr>
+					<th>Script Name</th>
 					<th>Source Server</th>
 					<th>Source Path</th>
 					<th>Destination Server</th>
 					<th>Destination Path</th>
+					<th>Daily Backup</th>
 					<th>Action</th>
 				</tr>
 
 				<?php foreach($scripts as $script):?>
 				<tr>
+					<td>
+						<?= $script['script_name']?>		
+					</td>
 					<td>
 						<?= $script['source_server']?>		
 					</td>	
@@ -128,15 +149,30 @@
 					<td>
 						<?= $script['destination_path']?>		
 					</td>
+					
+					<td>
+						<?php if(isset($daily_backup[$script['script_id']])): ?>
+							<form method="post" action="<?= BASE_URL.'do_action.php' ?>">
+								
+								<input type="hidden" name="action" value="toggle_daily_backup">
+								<input type="hidden" name="script_id" value="<?= $script['script_id'] ?>">
+								<?php?>
+								<input class="backup_checkbox" type="checkbox" name="backup" value="1" <?php echo $daily_backup[$script['script_id']] == 1? "checked":"" ?>>
+							</form>
+							<?php else:?>
+								<a class="btn btn-add" href="<?= BASE_URL.'index.php?action=backup_dir' ?>">Set Backup Path</a>
+						<?php endif;?>
+					</td>
+					
 					<td>
 						<?php if($script['process_id'] < 1):?>
-							<a href="<?= BASE_URL.'do_action.php?action=run_script&script_id='.$script['script_id'] ?>"><button class="btn-start">Start</button></a>
+							<a href="<?= BASE_URL.'do_action.php?action=run_script&script_id='.$script['script_id'] ?>"><button class="btn-start">Run</button></a>
 						<?php else:?>
 							<a href="<?= BASE_URL.'do_action.php?action=stop_script&script_id='.$script['script_id'] ?>"><button class="btn-stop">Stop</button></a>
 						<?php endif;?>
 					</td>
 					<td>
-						<a href="<?= BASE_URL.'do_action.php?action=delete_script&script_id='.$script['script_id'] ?>"><button class="btn-stop">Delete</button></a>
+						<a><button onclick="confirmDeleteScript(<?php echo $script['script_id']?>)" class="btn-stop">Delete</button></a>
 					</td>
 				</tr>
 				<?php endforeach;?>
@@ -154,6 +190,12 @@
 let addServerFormToggle = true
 let addScriptFormToggle = true
 
+
+function confirmDeleteScript(id){
+	let i = confirm("Are you sure ?")
+	if(i) window.location.assign("<?= BASE_URL.'do_action.php?action=delete_script&script_id=' ?>" + id)
+	return true;	
+}
 
 $('.add-server-label').on('click',function(event){
 	
@@ -197,5 +239,11 @@ $('.add-script-label').on('click',function(event){
 		})
 		addScriptFormToggle=true
 	}
+})
+
+$('.backup_checkbox').on('input',function(event){
+
+	console.log(event.target.parentElement)
+	event.target.parentElement.submit()
 })
 </script>
