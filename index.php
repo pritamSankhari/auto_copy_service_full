@@ -75,6 +75,19 @@
 	}
 
 	// -----------------------
+	// SHOW LOG DATES
+	// -----------------------	
+	else if(isset($_GET['action']) && $_GET['action'] == 'show_script_log_dates'){
+		
+		$script_log_table = new ScriptLog($db,$_GET['script_id']);
+
+		$log_dates = $script_log_table->getDates();
+		$script_id = $_GET['script_id'];
+ 		
+		$view = 'views/show_log_dates.php';
+	}
+
+	// -----------------------
 	// IMPORT LOG
 	// -----------------------	
 	else if(isset($_GET['action']) && $_GET['action'] == 'import_from_txt'){

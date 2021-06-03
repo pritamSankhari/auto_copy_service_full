@@ -95,49 +95,7 @@
 		}
 
 		function getAllInDetail(){
-			/*
-			$sql = "
-			SELECT  
-				backup_dirs.auto_backup as daily_backup,
-				scripts2.destination_server as destination_server,
-				scripts2.destination_path as destination_path,
-				scripts2.script_id as script_id,
-				scripts2.script_name as script_name,
-				scripts2.process_id as process_id,
-				scripts2.source_server as source_server,
-				scripts2.source_path as source_path
-			FROM 
-				backup_dirs
-				JOIN
-					(SELECT 
-						servers.name as destination_server,
-		    			servers.path as destination_path,
-		    			scripts1.id as script_id,
-		    			scripts1.name as script_name,
-		    			scripts1.process_id as process_id,
-		    			scripts1.source_server as source_server,
-		    			scripts1.source_path as source_path
-		    		FROM 
-		    			servers 
-		    			JOIN 
-							(SELECT  
-						     	scripts.id,
-						     	scripts.name,
-						     	scripts.process_id,
-						     	servers.name as source_server,
-						     	servers.path as source_path, 
-						     	scripts.destination_id 
-						     	
-						     	FROM 
-						     		scripts 
-					     		JOIN 
-						     		servers 
-					     		ON scripts.source_id=servers.id) 
-						as scripts1
-					ON servers.id = scripts1.destination_id) 
-				as scripts2 
-			ON scripts2.script_id = backup_dirs.script_id";
-			*/
+			
 			$sql = "
 			SELECT 
 				servers.name as destination_server,
@@ -176,6 +134,34 @@
 					$scripts[] = $row;
 				}
 				return $scripts;
+
+			}
+
+			return false;
+		}
+		function getSourceByScript($script_id){
+			$sql = "
+			SELECT 
+				servers.name as source_server,
+    			servers.path as source_path,
+    			scripts.id as script_id,
+    			scripts.name as script_name,
+    			scripts.process_id as process_id
+
+    		FROM 
+    			servers 
+    			JOIN 
+				scripts
+			ON servers.id = scripts.source_id
+
+			WHERE scripts.id = $script_id";
+
+			if(!$result = $this->database->query($sql)) return false;
+
+			$scripts = array();
+			
+			if($result->num_rows > 0){
+				return $result->fetch_assoc();
 
 			}
 

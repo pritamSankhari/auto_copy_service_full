@@ -1,6 +1,7 @@
 <?php
 	
 	session_start();
+	error_reporting(0);
 	require './config/url.php';
 	require './config/db.php';
 	require './classes/server_list.php';
@@ -502,13 +503,77 @@
 
 		$script_log = new ScriptLog($db,$script_id);
 
+		$scriptList = new ScriptList($db);
+		$source = $scriptList->getSourceByScript($script_id);
+
 		for($i=0;$i<count($log_id);$i++){
 
-			if(!$script_log->deleteById($log_id[$i])){
+
+			$file = $script_log->getFilenameByID($log_id[$i]);
+
+			try{
+				unlink($source['source_path']."\\".$file);	
+			}
+			catch(Exception $e){
+
+			}
+			
+			if(!$script_log->deleteByFilename($file)){
 
 				set_status('Failed to delete log !', 0);
 				header('Location:'.BASE_URL);
-				exit();			
+				exit();					
+			}
+		}
+
+		set_status('Log(s) have been deleted successfully !', 1);
+		header('Location:'.BASE_URL);
+		exit();
+
+	}
+
+	// REMOVE SELECTED LOG(S) BY DATE
+	// -----------------------
+	else if($_POST['action'] == 'remove_selected_log_date'){
+
+		if(
+			!isset($_POST['script_id']) || empty($_POST['script_id'])
+		){
+
+			set_status('Script ID not set !', 0);
+			header('Location:'.BASE_URL);
+			exit();	
+		}
+
+		$script_id = $db->real_escape_string($_POST['script_id']);
+		$log_date = $_POST['log_date'];
+
+		$script_log = new ScriptLog($db,$script_id);
+
+		$scriptList = new ScriptList($db);
+		$source = $scriptList->getSourceByScript($script_id);
+
+		echo "Removing...";
+		for($i=0;$i<count($log_date);$i++){
+
+			$files = $script_log->getFilenamesByDate($log_date[$i]);
+
+			
+			for($j = 0;$j < count($files);$j++){
+
+				try{
+					unlink($source['source_path']."\\".$files[$j]);	
+				}
+				catch(Exception $e){
+
+				}
+				
+				if(!$script_log->deleteByFilename($files[$j])){
+
+					set_status('Failed to delete log !', 0);
+					header('Location:'.BASE_URL);
+					exit();					
+				}
 			}
 		}
 

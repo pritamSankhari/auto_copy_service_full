@@ -51,7 +51,17 @@
 
 			$sql = "DELETE FROM $this->table WHERE id = '$id'";
 
-			echo $sql;
+			
+			if($this->database->query($sql)) return true;
+
+			return false;
+		}
+
+		function deleteByFilename($filename){
+
+			$sql = "DELETE FROM $this->table WHERE copied_file = '$filename'";
+
+			
 			if($this->database->query($sql)) return true;
 
 			return false;
@@ -72,6 +82,71 @@
 					while($row = $result->fetch_assoc()){
 
 						$data[] = $row;
+					}
+					return $data;
+				}
+
+			}
+
+			return false;
+		}
+
+		function getDates(){
+
+			$sql = "SELECT DISTINCT on_date FROM $this->table ORDER BY on_date DESC";
+
+
+			if($result = $this->database->query($sql)){
+
+				if($result->num_rows > 0){
+
+					$data = array();
+
+					while($row = $result->fetch_assoc()){
+
+						$data[] = $row;
+					}
+					return $data;
+				}
+
+			}
+
+			return false;
+
+
+		}
+
+		function getFilenameByID($id){
+			
+			$sql = "SELECT * FROM $this->table WHERE id = '$id'";
+
+
+			if($result = $this->database->query($sql)){
+
+				if($result->num_rows > 0){
+					$row = $result->fetch_assoc();
+					return $row['copied_file'];
+				}
+
+			}
+
+			return false;			
+		}
+
+		function getFilenamesByDate($date){
+
+			$sql = "SELECT * FROM $this->table WHERE on_date = '$date'";
+
+
+			if($result = $this->database->query($sql)){
+
+				if($result->num_rows > 0){
+
+					$data = array();
+
+					while($row = $result->fetch_assoc()){
+
+						$data[] = $row['copied_file'];
 					}
 					return $data;
 				}

@@ -9,43 +9,34 @@
 
 <section class="script-list-block">
 	<form method="post" action="do_action.php">
-		<?php if($script_logs):?>
-			<h2 style="text-align: center;">Server(s)</h2>
+		<?php if($log_dates):?>
+			<h2 style="text-align: center;">Log Dates</h2>
 			<div>
 				<div style="background-color: darkslateblue;color: white;font-weight: 900;">
 					<label>Select All Logs</label>
 					<input class="selectall" type="checkbox" name="">
 
-					<input type="hidden" name="action" value="remove_selected_logs">
+					<input type="hidden" name="action" value="remove_selected_log_date">
 					<input type="hidden" name="script_id" value="<?= $script_id ?>">
 					<input style="width: 200px;" class="btn btn-stop" type="submit" name="remove" value="Remove Selected">
-					<a class="btn btn-start remove-by-date-btn">Remove By Date</a>
-					
 				</div>
 				
 				<table id="show_log_table">
-					<tr><th></th>
-						<th>Filename</th>
-						<th>Date</th>
-						<th>Time</th>
-						
-						<!-- <th>Action</th> -->
+					<tr>
+						<th>Log Dates</th>
+						<th></th>
 					</tr>
 
-					<?php foreach($script_logs as $log):?>
+					<?php foreach($log_dates as $date):?>
 					<tr style="border-bottom: 2px solid black;">
+						
 						<td style="border-bottom: 1px solid darkslateblue;">
-							<input class="log" type="checkbox" name="log_id[]" value="<?= $log['id']?>">
+							<?= $date['on_date']?>		
 						</td>
 						<td style="border-bottom: 1px solid darkslateblue;">
-							<?= $log['copied_file']?>		
+							<input class="log" type="checkbox" name="log_date[]" value="<?= $date['on_date']?>">
 						</td>	
-						<td style="border-bottom: 1px solid darkslateblue;">
-							<?= $log['on_date']?>		
-						</td>
-						<td style="border-bottom: 1px solid darkslateblue;">
-							<?= $log['at_time']?>		
-						</td>
+						
 						
 						<!-- <td style="border-bottom: 1px solid darkslateblue;">
 							<a><button class="btn-stop" onclick="confirmDelete(<?php echo $log['id']?>,<?= $script_id ?>)">Delete</button></a>	
@@ -97,10 +88,4 @@
 		if(i) window.location.assign("<?= BASE_URL.'do_action.php?action=remove_log&log_id=' ?>" + id + "&script_id=" + script_id)
 		return true;	
 	}
-
-	$(".remove-by-date-btn").on("click",function(){
-
-		window.location.assign("<?= BASE_URL.'index.php?action=show_script_log_dates&script_id='.$script_id ?>")
-
-	})
 </script>
