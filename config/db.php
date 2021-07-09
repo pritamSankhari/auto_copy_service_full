@@ -2,7 +2,7 @@
 	$username = 'root';
 	$hostserver = 'localhost';
 	$database = 'acs';
-	$password = 'MyPasswordNew';
+	$password = '';
 
 	$db = new mysqli($hostserver,$username,$password,$database);
 	

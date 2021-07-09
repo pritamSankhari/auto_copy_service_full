@@ -3,7 +3,7 @@
 
 	function run_script($db,$id){
 		
-		$script = new Process(['start','tools\acsv2',$id]);
+		$script = new Process(['tools/acsv2',$id]);
 		$script->start();
 
 		$scriptList = new ScriptList($db);
@@ -34,7 +34,7 @@
 
 		if($daily_backup[$script_id] == 0) return false;
 
-		$script = new Process(['start','tools\ab',$script_id]);
+		$script = new Process(['tools/b',$script_id]);
 		$script->start();
 
 		
@@ -61,7 +61,7 @@
 
 		$process_id = $scripts['process_id'];
 
-		exec("taskkill /F /PID $process_id");
+		exec("kill -9 $process_id");
 		
 		if($scriptList->updateProcessId($id)) return true;
 
