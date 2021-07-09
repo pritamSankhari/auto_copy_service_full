@@ -62,6 +62,20 @@
 	}
 
 	// -----------------------
+	// EDIT SCRIPT NAME
+	// -----------------------	
+	else if(isset($_GET['action']) && $_GET['action'] == 'edit_script_name'){
+
+		if(isset($_GET['script_id']) && !empty($_GET['script_id'])){
+
+			$scriptList = new ScriptList($db);
+			$script = $scriptList->getScriptById($_GET['script_id']);	
+			$view = 'views/edit_script_name.php';
+		}
+		else $view = 'views/error_404.php';
+	}
+
+	// -----------------------
 	// SHOW LOG
 	// -----------------------	
 	else if(isset($_GET['action']) && $_GET['action'] == 'show_script_log'){

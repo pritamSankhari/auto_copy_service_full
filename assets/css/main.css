@@ -239,6 +239,13 @@ button,.btn{
 	padding: 20px;
 }
 
+.script-list-block table tr:hover{
+
+	background-color: lightgrey;
+	cursor: pointer;
+	user-select: none;
+}
+
 #show_servers_table td{
 	border-bottom: 1px solid lightgrey;
 }

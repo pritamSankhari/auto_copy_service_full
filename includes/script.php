@@ -9,14 +9,15 @@
 		$scriptList = new ScriptList($db);
 
 		if(!$scripts = $scriptList->getScriptById($id)) return false;
-		$process_id = (int) $scripts[0]['process_id'];
+		$process_id = (int) $scripts['process_id'];
 
 		while($process_id < 1){
 
 			if(!$scripts = $scriptList->getScriptById($id)) return false;
-			$process_id = (int) $scripts[0]['process_id'];	
+			$process_id = (int) $scripts['process_id'];	
 
 			if( $process_id < 0 ) return false;
+			
 		}
 		
 		return true;
@@ -58,7 +59,7 @@
 
 		if(!$scripts = $scriptList->getScriptById($id)) return false;
 
-		$process_id = $scripts[0]['process_id'];
+		$process_id = $scripts['process_id'];
 
 		exec("taskkill /F /PID $process_id");
 		

@@ -132,49 +132,60 @@
 					<th>Action</th>
 				</tr>
 
+				<?php $i=1; ?>
 				<?php foreach($scripts as $script):?>
 				<tr>
-					<td>
-						<?= $script['script_name']?>		
-					</td>
-					<td>
-						<?= $script['source_server']?>		
-					</td>	
-					<td>
-						<?= $script['source_path']?>		
-					</td>
-					<td>
-						<?= $script['destination_server']?>		
-					</td>
-					<td>
-						<?= $script['destination_path']?>		
-					</td>
-					
-					<td>
-						<?php if(isset($daily_backup[$script['script_id']])): ?>
-							<form method="post" action="<?= BASE_URL.'do_action.php' ?>">
-								
-								<input type="hidden" name="action" value="toggle_daily_backup">
-								<input type="hidden" name="script_id" value="<?= $script['script_id'] ?>">
-								<?php?>
-								<input class="backup_checkbox" type="checkbox" name="backup" value="1" <?php echo $daily_backup[$script['script_id']] == 1? "checked":"" ?>>
-							</form>
+					<div>
+						<td>
+							<span><?= $script['script_name']?></span>
+							<br>
+							<a href="<?= BASE_URL.'index.php?action=edit_script_name&script_id='.$script['script_id'] ?>">
+								<span style="margin-left: 10px;color:limegreen;"><i class="fas fa-edit"></i></span>
+							</a>
+
+							<span class="shift-up" data-serial-no="<?= $script['serial_no']?>" style="cursor: pointer;"><i class="fas fa-chevron-up" style="background-color: black;color:white;padding: 5px;margin: 5px;border-radius: 100%;"></i></span>	
+							<!-- <span class="shift-down" style="cursor: pointer;"><i class="fas fa-chevron-down"></i></span> -->
+						</td>
+						<td>
+							<?= $script['source_server']?>		
+						</td>	
+						<td>
+							<?= $script['source_path']?>		
+						</td>
+						<td>
+							<?= $script['destination_server']?>		
+						</td>
+						<td>
+							<?= $script['destination_path']?>		
+						</td>
+						
+						<td>
+							<?php if(isset($daily_backup[$script['script_id']])): ?>
+								<form method="post" action="<?= BASE_URL.'do_action.php' ?>">
+									
+									<input type="hidden" name="action" value="toggle_daily_backup">
+									<input type="hidden" name="script_id" value="<?= $script['script_id'] ?>">
+									<?php?>
+									<input class="backup_checkbox" type="checkbox" name="backup" value="1" <?php echo $daily_backup[$script['script_id']] == 1? "checked":"" ?>>
+								</form>
+								<?php else:?>
+									<a class="btn btn-add" href="<?= BASE_URL.'index.php?action=backup_dir' ?>">Set Backup Path</a>
+							<?php endif;?>
+						</td>
+						
+						<td>
+							<?php if($script['process_id'] < 1):?>
+								<a href="<?= BASE_URL.'do_action.php?action=run_script&script_id='.$script['script_id'] ?>"><button class="btn-start">Run</button></a>
 							<?php else:?>
-								<a class="btn btn-add" href="<?= BASE_URL.'index.php?action=backup_dir' ?>">Set Backup Path</a>
-						<?php endif;?>
-					</td>
-					
-					<td>
-						<?php if($script['process_id'] < 1):?>
-							<a href="<?= BASE_URL.'do_action.php?action=run_script&script_id='.$script['script_id'] ?>"><button class="btn-start">Run</button></a>
-						<?php else:?>
-							<a href="<?= BASE_URL.'do_action.php?action=stop_script&script_id='.$script['script_id'] ?>"><button class="btn-stop">Stop</button></a>
-						<?php endif;?>
-					</td>
-					<td>
-						<a><button onclick="confirmDeleteScript(<?php echo $script['script_id']?>)" class="btn-stop">Delete</button></a>
-					</td>
+								<a href="<?= BASE_URL.'do_action.php?action=stop_script&script_id='.$script['script_id'] ?>"><button class="btn-stop">Stop</button></a>
+							<?php endif;?>
+						</td>
+						<td>
+							<a><button onclick="confirmDeleteScript(<?php echo $script['script_id']?>)" class="btn-stop">Delete</button></a>
+						</td>
+					</div>	
 				</tr>
+				<?php $i++;?>
 				<?php endforeach;?>
 			</table>
 		</div>
@@ -246,4 +257,61 @@ $('.backup_checkbox').on('input',function(event){
 	console.log(event.target.parentElement)
 	event.target.parentElement.submit()
 })
+
+let scriptsRows = document.querySelectorAll('.script-list-block table tr')
+// scriptsRows.shift();
+
+let shiftUp = document.querySelectorAll('.shift-up')
+let shiftDown = document.querySelectorAll('.shift-down')
+// console.log(shiftUp)
+// console.log(scriptsRows)
+// $('.shift-up').on('click',function(event){
+
+// 	console.dir(event.target.parentElement.parentElement.parentElement)
+// })
+
+console.log($('.shift-up'))
+
+// function shiftup(i);
+// function initShiftupClickEvent();
+
+function shiftup(i){
+
+	if(i == 0) return
+
+	let tmp = scriptsRows[i].innerHTML
+	scriptsRows[i].innerHTML = scriptsRows[i+1].innerHTML
+	scriptsRows[i+1].innerHTML = tmp
+
+	shiftUp = document.querySelectorAll('.shift-up')
+	scriptsRows = document.querySelectorAll('.script-list-block table tr')
+	initShiftupClickEvent(i-1)
+	initShiftupClickEvent(i)
+
+}
+function initShiftupClickEvent(i){
+	
+
+		
+		shiftUp[i].addEventListener('click', function(event){
+
+			
+			let script_serial_no = event.target.parentElement.attributes[1].nodeValue
+
+			// interchange script position
+			$.post('do_action.php',{action:'interchange_script_position',serial_no:script_serial_no},function(data){
+				
+				let response = JSON.parse(data)
+
+				if(response) window.location = location.origin + '/acsms/'
+			})
+			
+			shiftup(i)
+			this.removeEventListener('click', arguments.callee)
+		})
+	
+}
+for(let i=0;i<shiftUp.length;i++){
+	initShiftupClickEvent(i)
+}
 </script>

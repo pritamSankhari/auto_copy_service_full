@@ -20,12 +20,15 @@
 			$this->source_id = $src_id;
 			$this->destination_id = $dest_id;
 
+			$lastSerialNo = $this->getLastScriptSerialNo();
+			$lastSerialNo++;
+			
 			$sql = " 
 
 			INSERT INTO 
-				scripts(name , source_id , destination_id) 
+				scripts(name , source_id , destination_id, serial_no) 
 
-			VALUES('$this->name', '$this->source_id' ,'$this->destination_id')";
+			VALUES('$this->name', '$this->source_id' ,'$this->destination_id', $lastSerialNo)";
 
 			if($result = $this->database->query($sql))
 				return true;
@@ -70,15 +73,75 @@
 			$scripts = array();
 			
 			if($result->num_rows > 0){
-
-				while($row = $result->fetch_assoc()){
-					$scripts[] = $row;
-				}
-				return $scripts;
+				return $result->fetch_assoc();
 
 			}
 
 			return false;
+		}
+
+		function getLastScriptSerialNo(){
+
+			$this->id = $id;	
+			
+			$sql = "
+
+				SELECT * FROM scripts  ORDER BY serial_no DESC LIMIT 0,1
+			";
+
+			if(!$result = $this->database->query($sql)) return false;
+
+			$scripts = array();
+			
+			if($result->num_rows > 0){
+				return $result->fetch_assoc()['serial_no'];
+
+			}
+
+			return false;
+		}
+
+		function interchangeScriptSerial($serial_no){
+
+			$sql = "
+
+				SELECT * FROM scripts WHERE serial_no < $serial_no  ORDER BY serial_no DESC LIMIT 0,2
+			";
+
+			if(!$result = $this->database->query($sql)) return false;
+
+			
+			
+			if($result->num_rows > 0){
+
+				
+				$previous_serial = $result->fetch_assoc()['serial_no'];
+
+			}
+
+			else return false;
+
+			$sql1 = "UPDATE scripts SET serial_no = -1 WHERE serial_no = $previous_serial";
+			$sql2 = "UPDATE scripts SET serial_no = $previous_serial WHERE serial_no = $serial_no";
+			$sql3 = "UPDATE scripts SET serial_no = $serial_no WHERE serial_no = -1";
+
+			$this->database->query($sql1);
+			$this->database->query($sql2);
+			$this->database->query($sql3);
+
+			return true;
+		}
+
+		function updateScriptName($id,$name){
+
+			$sql = "
+
+				UPDATE scripts SET name = '$name' WHERE id = $id
+			";
+
+			if(!$result = $this->database->query($sql)) return false;
+
+			return true;	
 		}
 
 		function updateProcessId($id){
@@ -101,6 +164,7 @@
 				servers.name as destination_server,
     			servers.path as destination_path,
     			scripts1.id as script_id,
+    			scripts1.serial_no as serial_no,
     			scripts1.name as script_name,
     			scripts1.process_id,
     			scripts1.source_server,
@@ -110,6 +174,7 @@
     			JOIN 
 					(SELECT 
 				     	scripts.id,
+				     	scripts.serial_no,
 				     	scripts.name,
 				     	scripts.process_id,
 				     	servers.name as source_server,
@@ -122,7 +187,8 @@
 				     		servers 
 			     		ON scripts.source_id=servers.id) 
 				as scripts1
-			ON servers.id = scripts1.destination_id";
+			ON servers.id = scripts1.destination_id 
+			ORDER BY scripts1.serial_no  ";
 
 			if(!$result = $this->database->query($sql)) return false;
 

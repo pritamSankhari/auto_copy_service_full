@@ -393,6 +393,52 @@
 		exit();			
 		
 	}
+
+	// -----------------------
+	// UPDATE SCRIPT NAME
+	// -----------------------
+	else if($_POST['action'] == 'update_script_name'){
+
+		if(
+			!isset($_POST['script_name']) ||
+			!isset($_POST['script_id']) || 
+			
+			empty($_POST['script_name']) || 
+			empty($_POST['script_id']) ){
+			
+			set_status('Script ID and Script Name are not set !', 0);
+			header('Location:'.BASE_URL);
+			exit();
+		}
+
+		$script_name = $db->real_escape_string($_POST['script_name']);
+		$script_id = $db->real_escape_string($_POST['script_id']);
+		$scriptList = new ScriptList($db);
+
+		if($scriptList->updateScriptName($script_id,$script_name)){
+			set_status('Script name updated !', 1);
+			header('Location:'.BASE_URL);
+			exit();
+		}
+
+		set_status('Failed to update !', 0);
+		header('Location:'.BASE_URL);
+		exit();
+
+	}
+
+	// -----------------------
+	// INTERCHANGE SCRIPT POSTITION
+	// -----------------------
+	else if($_POST['action'] == 'interchange_script_position'){
+
+		$scriptList = new ScriptList($db);
+		
+		if($scriptList->interchangeScriptSerial($_POST['serial_no'])) echo "true";
+
+		else echo "false";
+	}
+
 	// -----------------------
 	// TOGGLE DAILY BACKUP
 	// -----------------------
